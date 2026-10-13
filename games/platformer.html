@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10111d">
+<title>Lupin Platformer — Multiplayer Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#0c0d16;--panel:#151725;--muted:#a8acc4;--text:#f7f7ff;--line:#2a2d43;--purple:#9c8cff;--cyan:#7be7dc;--pink:#ff83bd}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#342c5b 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,sans-serif}.wrap{max-width:1120px;margin:auto;padding:20px}a{color:inherit;text-decoration:none}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{font-weight:900;letter-spacing:-.04em;font-size:1.2rem}.brand span{color:var(--purple)}.back{color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:16px}.panel{border:1px solid var(--line);border-radius:18px;background:#12131f;padding:16px}.head h1{margin:0;font-size:clamp(1.8rem,5vw,3rem);letter-spacing:-.06em}.head p{color:var(--muted);margin:5px 0 18px}.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.field{min-width:0;background:#0d0e18;border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--text)}input.field{width:145px}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;background:var(--purple);color:#11121c;cursor:pointer}.btn.secondary{background:#25263a;color:var(--text);border:1px solid var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#111327;border:1px solid #343654;border-radius:12px;image-rendering:pixelated;touch-action:none}.status{font-size:.9rem;color:var(--muted);margin:10px 0 0}.status strong{color:var(--cyan)}.side h2{font-size:1rem;margin:0 0 10px}.players{display:grid;gap:8px;margin-bottom:20px}.player{display:flex;align-items:center;gap:8px;padding:9px;border-radius:10px;background:#1b1c2c;font-size:.9rem}.dot{width:10px;height:10px;border-radius:4px;background:var(--purple);flex:none}.help{color:var(--muted);font-size:.9rem}.help kbd{background:#25263a;border:1px solid #41435c;border-radius:5px;padding:2px 5px;color:var(--text)}.mobile{display:flex;justify-content:space-between;gap:8px;margin-top:10px}.mobile button{flex:1;min-height:48px;font-size:1.15rem;touch-action:none}.tiny{color:var(--muted);font-size:.78rem;margin-top:16px;overflow-wrap:anywhere}.pill{display:inline-block;background:#203333;color:var(--cyan);padding:3px 7px;border-radius:999px;font-size:.75rem;font-weight:800}@media(max-width:780px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr;gap:16px}.players{margin:0}.wrap{padding:12px}}@media(max-width:480px){.side{grid-template-columns:1fr}.top{align-items:flex-start}.controls .field{flex:1;width:100px}}
+</style>
+</head>
+<body><div class="wrap">
+<header class="top"><a class="brand" href="../">LUPIN<span>✦</span>GAMING</a><a class="back" href="../">← Arcade home</a></header>
+<div class="head"><h1>Skybound Showdown</h1><p>Race across floating platforms, snag the stars, and reach the portal first.</p></div>
+<div class="layout"><main class="panel">
+<div class="controls"><input class="field" id="name" maxlength="16" placeholder="Your player name" aria-label="Player name"><input class="field" id="room" maxlength="8" placeholder="Room code" aria-label="Room code"><button class="btn" id="join">Create / Join room</button><button class="btn secondary" id="leave" disabled>Leave</button></div>
+<canvas id="game" width="960" height="540" aria-label="Platformer game canvas"></canvas>
+<div class="mobile"><button class="btn secondary" id="left" aria-label="Move left">◀</button><button class="btn secondary" id="jump">▲ Jump</button><button class="btn secondary" id="right" aria-label="Move right">▶</button></div>
+<p class="status" id="status">Solo practice ready. Create a room to race with friends. <strong>Move: A/D or ←/→ · Jump: W/↑/Space</strong></p>
+</main><aside class="panel side"><section><h2>Players in room <span class="pill" id="count">1</span></h2><div class="players" id="players"><div class="player"><span class="dot"></span>You · solo practice</div></div></section><section><h2>How to play</h2><p class="help"><kbd>A</kbd> <kbd>D</kbd> or arrow keys to move. <kbd>W</kbd>, <kbd>↑</kbd> or <kbd>Space</kbd> to jump. Reach the glowing portal at the far right.</p><p class="help">Create a room and share its code. Friends enter the same code to appear in your world.</p><p class="tiny">Multiplayer server: <span id="server">checking…</span></p></section></aside></div>
+<p class="tiny">Lupin Gaming · Skybound Showdown · Personal progress stays in this browser. Multiplayer requires the Lupin Platformer room service to be online.</p>
+</div>
+<script>
+(()=> {
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
+const W=960,H=540,gravity=.62,levelWidth=2800;
+const platforms=[{x:0,y:480,w:460,h:60},{x:520,y:430,w:190,h:24},{x:770,y:365,w:180,h:24},{x:1010,y:420,w:180,h:24},{x:1260,y:345,w:190,h:24},{x:1530,y:410,w:200,h:24},{x:1800,y:330,w:180,h:24},{x:2050,y:395,w:190,h:24},{x:2320,y:320,w:180,h:24},{x:2600,y:450,w:200,h:90}];
+const me={id:'local-'+Math.random().toString(36).slice(2,8),name:'Player',x:70,y:400,vx:0,vy:0,w:28,h:38,color:'#9c8cff',ground:false,won:false};
+let players=new Map([[me.id,me]]),keys={},socket=null,roomCode='',connected=false,camera=0,stars=[{x:600,y:390},{x:850,y:325},{x:1320,y:305},{x:1870,y:290},{x:2380,y:280}],gotStars=new Set(),lastSend=0,lastFrame=0;
+const rnd=(a,b)=>Math.random()*(b-a)+a;
+function draw(){ctx.clearRect(0,0,W,H);let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#171933');bg.addColorStop(1,'#10111d');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ctx.save();ctx.translate(-camera,0);
+for(let i=0;i<50;i++){let x=(i*197)%levelWidth,y=(i*83)%280;ctx.fillStyle='rgba(255,255,255,.45)';ctx.fillRect(x,y,2,2)}
+// distant floating islands
+for(let i=0;i<12;i++){let x=i*260+70;ctx.fillStyle='#242746';ctx.beginPath();ctx.ellipse(x,100+(i%3)*32,60,12,0,0,Math.PI*2);ctx.fill()}
+for(const p of platforms){ctx.fillStyle='#292d50';ctx.fillRect(p.x,p.y,p.w,p.h);ctx.fillStyle='#7be7dc';ctx.fillRect(p.x,p.y,p.w,5);ctx.fillStyle='#191b34';for(let x=p.x+10;x<p.x+p.w;x+=28)ctx.fillRect(x,p.y+10,12,4)}
+for(let i=0;i<stars.length;i++){if(gotStars.has(i))continue;const s=stars[i];ctx.save();ctx.translate(s.x,s.y);ctx.rotate(performance.now()/700);ctx.fillStyle='#ffd778';ctx.shadowColor='#ffd778';ctx.shadowBlur=18;ctx.beginPath();for(let k=0;k<10;k++){let r=k%2?7:15,a=k*Math.PI/5-Math.PI/2;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill();ctx.restore()}
+ctx.fillStyle='#7be7dc';ctx.shadowColor='#7be7dc';ctx.shadowBlur=22;ctx.fillRect(2720,375,14,75);ctx.fillStyle='#f7f7ff';ctx.font='bold 15px system-ui';ctx.fillText('PORTAL',2675,360);ctx.shadowBlur=0;
+for(const p of players.values()){ctx.fillStyle=p.color||'#ff83bd';ctx.fillRect(p.x,p.y,p.w||28,p.h||38);ctx.fillStyle='#f7f7ff';ctx.fillRect(p.x+6,p.y+9,4,4);ctx.fillRect(p.x+18,p.y+9,4,4);ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.fillText(p.name||'Player',p.x+14,p.y-9);if(p.id===me.id){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(p.x-3,p.y-3,34,44)}}ctx.restore();
+ctx.fillStyle='rgba(8,9,20,.75)';ctx.fillRect(15,15,150,37);ctx.fillStyle='#f7f7ff';ctx.font='bold 15px system-ui';ctx.fillText('⭐ '+gotStars.size+'/'+stars.length+' stars',27,39);
+}
+function collide(){me.ground=false;for(const p of platforms){if(me.vy>=0&&me.x+me.w>p.x&&me.x<p.x+p.w&&me.y+me.h<=p.y+me.vy+2&&me.y+me.h+me.vy>=p.y){me.y=p.y-me.h;me.vy=0;me.ground=true}}}
+function update(dt){const step=Math.min(dt/16.67,2);me.vx=((keys.ArrowRight||keys.d||keys.D||rightHeld?1:0)-(keys.ArrowLeft||keys.a||keys.A||leftHeld?1:0))*4.2;me.x=Math.max(0,Math.min(levelWidth-me.w,me.x+me.vx*step));me.vy=Math.min(12,me.vy+gravity*step);me.y+=me.vy*step;collide();if(me.y>H+150){me.x=Math.max(40,me.x-180);me.y=300;me.vy=0}
+for(let i=0;i<stars.length;i++){const s=stars[i];if(!gotStars.has(i)&&Math.abs(me.x+14-s.x)<24&&Math.abs(me.y+18-s.y)<28){gotStars.add(i);}}
+if(me.x>2710&&!me.won){me.won=true;$('status').innerHTML='🏆 <strong>You reached the portal!</strong> Refresh to race again.'}
+camera=Math.max(0,Math.min(levelWidth-W,me.x-W*.35));if(connected&&socket&&socket.readyState===1&&performance.now()-lastSend>50){socket.send(JSON.stringify({type:'move',x:me.x,y:me.y,vx:me.vx,vy:me.vy,stars:[...gotStars],won:me.won}));lastSend=performance.now()}
+}
+let leftHeld=false,rightHeld=false;
+function bindHold(id,set){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();set(true);el.setPointerCapture(e.pointerId)});for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,()=>set(false))}
+bindHold('left',v=>leftHeld=v);bindHold('right',v=>rightHeld=v);
+function jump(){if(me.ground){me.vy=-12.5;me.ground=false}}
+$('jump').addEventListener('pointerdown',e=>{e.preventDefault();jump()});
+document.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();keys[e.key]=true;if(['ArrowUp','w','W',' '].includes(e.key)&&!e.repeat)jump()});
+document.addEventListener('keyup',e=>keys[e.key]=false);
+function renderPlayers(){const el=$('players');el.replaceChildren();for(const p of players.values()){const row=document.createElement('div');row.className='player';const dot=document.createElement('span');dot.className='dot';dot.style.background=p.color||'#9c8cff';const label=document.createElement('span');label.textContent=(p.id===me.id?'You':p.name||'Player')+(p.won?' · finished':'');row.append(dot,label);el.append(row)}$('count').textContent=players.size}
+function setStatus(t){$('status').textContent=t}
+$('join').addEventListener('click',()=>joinRoom());
+$('leave').addEventListener('click',leaveRoom);
+function joinRoom(){if(socket)leaveRoom();roomCode=($('room').value.trim().toUpperCase()||Math.random().toString(36).slice(2,6).toUpperCase()).replace(/[^A-Z0-9]/g,'').slice(0,8);$('room').value=roomCode;me.name=($('name').value.trim()||'Player').slice(0,16);me.x=70;me.y=400;me.won=false;gotStars.clear();const base=window.LUPIN_PLATFORMER_WS||'wss://lupin-platformer.lujinsg.workers.dev';try{socket=new WebSocket(base+'/room/'+encodeURIComponent(roomCode)+'?name='+encodeURIComponent(me.name));}catch(e){setStatus('Could not connect. Solo practice still works.');return}
+setStatus('Connecting to room '+roomCode+'…');socket.addEventListener('open',()=>{connected=true;$('leave').disabled=false;$('join').disabled=true;setStatus('Connected to room '+roomCode+'. Share the code with friends!');});
+socket.addEventListener('message',ev=>{let m;try{m=JSON.parse(ev.data)}catch{return}if(m.type==='snapshot'){const next=new Map([[me.id,me]]);for(const p of m.players||[]){if(p.id===me.id)continue;next.set(p.id,{...p,w:28,h:38,color:p.color||'#ff83bd'})}players=next;renderPlayers()}else if(m.type==='welcome'){me.id=m.id;players.set(me.id,me);renderPlayers()}else if(m.type==='error'){setStatus('Room service: '+m.message)}});
+socket.addEventListener('close',()=>{connected=false;$('leave').disabled=true;$('join').disabled=false;players=new Map([[me.id,me]]);renderPlayers();if(roomCode)setStatus('Disconnected from room. Solo practice is still available.');});
+socket.addEventListener('error',()=>{setStatus('Multiplayer server is not reachable yet. You can still play solo practice.');});
+}
+function leaveRoom(){if(socket){socket.close();socket=null}connected=false;roomCode='';$('leave').disabled=true;$('join').disabled=false;players=new Map([[me.id,me]]);renderPlayers();setStatus('Solo practice ready. Create a room to race with friends.')}
+function loop(t){const dt=lastFrame?t-lastFrame:16.67;lastFrame=t;update(dt);draw();requestAnimationFrame(loop)}
+fetch('https://lupin-platformer.lujinsg.workers.dev/health').then(r=>r.ok?r.json():Promise.reject()).then(x=>$('server').textContent=x.ok?'online':'unavailable').catch(()=>$('server').textContent='not deployed yet');
+renderPlayers();requestAnimationFrame(loop);
+})();
+</script></body></html>

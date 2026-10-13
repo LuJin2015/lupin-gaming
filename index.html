@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10111d">
+<title>Lupin Gaming — Play something good</title>
+<style>
+:root{color-scheme:dark;--bg:#0c0d16;--panel:#151725;--muted:#a8acc4;--text:#f7f7ff;--line:#2a2d43;--purple:#9c8cff;--cyan:#7be7dc}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -15%,#37305e 0,transparent 40%),var(--bg);color:var(--text);font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+a{color:inherit;text-decoration:none}.wrap{max-width:1120px;margin:auto;padding:24px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0 22px}.brand{font-weight:850;letter-spacing:-.04em;font-size:1.25rem}.brand span{color:var(--purple)}.navlinks{display:flex;gap:18px;color:var(--muted);font-size:.92rem}
+.hero{padding:66px 0 54px;max-width:800px}.eyebrow{color:var(--cyan);font-size:.78rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}.hero h1{font-size:clamp(2.8rem,8vw,5.5rem);line-height:.98;letter-spacing:-.07em;margin:18px 0}.hero h1 em{font-style:normal;color:var(--purple)}.hero p{color:var(--muted);font-size:1.1rem;max-width:580px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:13px;font-weight:750;background:var(--purple);color:#10111d;border:1px solid transparent}.btn.secondary{background:#1a1c2c;color:var(--text);border-color:var(--line)}
+.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:16px 0}.sectionhead h2{font-size:1.55rem;letter-spacing:-.04em;margin:0}.sectionhead p{margin:0;color:var(--muted);font-size:.9rem}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.game{border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,#191b2c,#12131f);padding:22px;min-height:235px;display:flex;flex-direction:column;transition:transform .2s,border-color .2s}.game:hover{transform:translateY(-4px);border-color:#7770bb}.gameicon{width:54px;height:54px;display:grid;place-items:center;border-radius:16px;background:#292443;font-size:1.7rem}.tag{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);font-weight:800;margin-top:18px}.game h3{font-size:1.35rem;margin:5px 0}.game p{color:var(--muted);margin:0 0 20px}.play{margin-top:auto;font-weight:800;color:var(--purple)}.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:40px 0}.feature{padding:18px;border:1px solid var(--line);border-radius:16px;background:#12131f}.feature b{display:block;margin-bottom:4px}.feature span{font-size:.9rem;color:var(--muted)}footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.85rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:650px){.wrap{padding:18px}.hero{padding:45px 0}.games{grid-template-columns:1fr}.features{grid-template-columns:1fr}.navlinks{gap:10px;font-size:.82rem}}
+</style>
+</head>
+<body><div class="wrap">
+<nav><a class="brand" href="./">LUPIN<span>✦</span>GAMING</a><div class="navlinks"><a href="#games">Games</a><a href="#features">Features</a><a href="https://github.com/LuJin2015/lupin-gaming">GitHub ↗</a></div></nav>
+<main><section class="hero"><div class="eyebrow">A tiny arcade with big energy</div><h1>Press play.<br>Enter <em>another world.</em></h1><p>Quick games, high scores, and secret surprises. Pick a game and see how far you can go.</p><div class="actions"><a class="btn" href="#games">Explore games ↓</a><a class="btn secondary" href="#features">What's coming</a></div></section>
+<section id="games"><div class="sectionhead"><h2>Choose your game</h2><p>Two games. Infinite rematches.</p></div><div class="games">
+<a class="game" href="./games/star-clicker.html"><div class="gameicon">✨</div><div class="tag">Arcade · Casual</div><h3>Star Clicker</h3><p>Tap the stars, build your streak, and beat your personal best before time runs out.</p><div class="play">Play now ↗</div></a>
+<a class="game" href="./games/snake.html"><div class="gameicon">🐍</div><div class="tag">Classic · Keyboard</div><h3>Neon Snake</h3><p>Collect glowing orbs, grow longer, and try not to run into yourself.</p><div class="play">Play now ↗</div></a>
+</div></section>
+<section id="features" class="features"><div class="feature"><b>🏆 Personal bests</b><span>Your browser remembers your local high scores.</span></div><div class="feature"><b>🧩 Secrets to discover</b><span>Keep an eye out for little hidden surprises.</span></div><div class="feature"><b>☁️ Shared features ahead</b><span>Accounts, global leaderboards and multiplayer are planned for a secure backend.</span></div></section></main>
+<footer><span>© Lupin Gaming · Made for curious players</span><span>Build v0.1 · More games loading…</span></footer></div>
+<script>document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='l'&&e.shiftKey&&e.altKey){document.body.style.setProperty('--purple','#7be7dc');document.title='Secret palette unlocked!';}});</script>
+</body></html>

@@ -20,3 +20,14 @@ The `lupin-platformer` Worker uses the separate Cloudflare D1 database `lupin-ga
 - `player_achievements` — persistent achievement unlocks.
 
 The API exposes `/api/leaderboard`, `/api/profile?playerId=...`, and `/api/progress`. XP and achievements are calculated server-side from validated progress; this is basic anti-cheat validation, not a fully cheat-proof competitive system. The original `lupin-cloud` database is not used by this game.
+
+## Credits
+
+**Project Lead:** Lu Jin
+
+**AI Development Assistant:** ChatGPT by OpenAI
+
+ChatGPT assisted with coding, debugging, documentation, and design. The Lupin projects were developed through human direction and AI assistance.
+
+Intellectual property rights remain subject to applicable law and the rights of the respective contributors and third-party authors.
+
